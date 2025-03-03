@@ -31,17 +31,20 @@ CHB-MIT EEG dataset
 TUH EEG Seizure Corpus
 Preprocessed using Fourier Transform & Wavelet Transform for noise reduction.
 🔧 Installation & Setup
+
 📌 Step 1: Install Dependencies
 bash
 Copy
 Edit
 pip install numpy pandas tensorflow keras xgboost scikit-learn matplotlib
+
 📌 Step 2: Clone the Repository
 bash
 Copy
 Edit
 git clone https://github.com/your-repo/seizure-detection.git
 cd seizure-detection
+
 📌 Step 3: Run the Training Script
 bash
 Copy
