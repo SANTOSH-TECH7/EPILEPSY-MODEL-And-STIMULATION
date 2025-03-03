@@ -9,6 +9,7 @@ XGBoost as the meta-classifier for final decision-making.
 The goal is to improve seizure prediction accuracy using deep learning and machine learning techniques.
 
 ⚙️ Model Architecture
+
 1️⃣ CNN (Convolutional Neural Network)
 ✅ Extracts spatial patterns from EEG signals.
 ✅ Uses convolutional layers + pooling layers to detect critical EEG features.
