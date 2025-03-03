@@ -51,12 +51,19 @@ bash
 Copy
 Edit
 python train_model.py
+
+
 📊 Model Performance & Results
 Model	Accuracy	Precision	Recall	F1-Score
+
 CNN	88.5%	86.2%	85.9%	86.0%
 LSTM	90.2%	89.5%	89.0%	89.2%
 Stacked Model (XGBoost + CNN + LSTM)	95.3%	94.8%	94.5%	94.6%
+
 📜 Citation & References
+
 If you use this model, please cite the following papers:
+
 📄 MIT EEG Seizure Dataset
+
 📄 XGBoost: A Scalable Tree Boosting System
