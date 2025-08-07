@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Epileptic Seizure Detection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .input-section {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid #e3e8ff;
+        }
+
+        .input-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .input-method {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .input-method h3 {
+            color: #4facfe;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .feature-input {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .feature-input label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .feature-input input {
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .feature-input input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            resize: vertical;
+            min-height: 120px;
+            font-family: monospace;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            border: 2px solid #e3e8ff;
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-card {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4facfe;
+        }
+
+        .result-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .result-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .seizure-positive {
+            color: #e74c3c;
+        }
+
+        .seizure-negative {
+            color: #27ae60;
+        }
+
+        .confidence-bar {
+            background: #e9ecef;
+            border-radius: 20px;
+            height: 30px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            border-radius: 20px;
+            transition: width 0.8s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .probabilities {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .prob-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+
+        .prob-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .prob-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #4facfe;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4facfe;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fff5f5;
+            border: 2px solid #fed7d7;
+            border-radius: 10px;
+            padding: 15px;
+            color: #c53030;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .info-section {
+            background: #e8f4ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 5px solid #4facfe;
+        }
+
+        .info-section h3 {
+            color: #2c5aa0;
+            margin-bottom: 10px;
+        }
+
+        .info-section p {
+            color: #5a6c7d;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .input-methods {
+                grid-template-columns: 1fr;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Epileptic Seizure Detection</h1>
+            <p>AI-Powered Real-time EEG Analysis System</p>
+        </div>
+
+        <div class="main-content">
+            <div class="info-section">
+                <h3>ℹ️ How to Use</h3>
+                <p>Enter EEG feature values using either method below. The system expects 178 numerical features representing processed EEG signals. For JSON input, provide an array of 178 numbers or use individual feature inputs.</p>
+            </div>
+
+            <div class="input-section">
+                <div class="input-methods">
+                    <div class="input-method">
+                        <h3>📝 JSON Input</h3>
+                        <textarea id="jsonInput" placeholder='Enter features as JSON array, e.g.:
+[0.123, -0.456, 0.789, ...]
+
+Or as an object:
+{"X1": 0.123, "X2": -0.456, ...}'></textarea>
+                    </div>
+
+                    <div class="input-method">
+                        <h3>🔢 Individual Features</h3>
+                        <div id="featureInputs" class="feature-grid">
+                            <!-- Feature inputs will be generated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button onclick="predict()">🔍 Analyze EEG Data</button>
+                    <button onclick="generateSample()">🎲 Generate Sample Data</button>
+                    <button onclick="clearInputs()">🗑️ Clear All</button>
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Analyzing EEG data...</p>
+            </div>
+
+            <div class="error" id="error"></div>
+
+            <div class="results-section" id="results">
+                <div class="result-card">
+                    <div class="result-title">Seizure Detection Result</div>
+                    <div class="result-value" id="predictionResult"></div>
+                    
+                    <div class="result-title">Confidence Level</div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" id="confidenceBar"></div>
+                    </div>
+                    
+                    <div class="result-title">Class Probabilities</div>
+                    <div class="probabilities" id="probabilities"></div>
+                    
+                    <div style="margin-top: 20px; color: #666; font-size: 0.9em;">
+                        <strong>Analysis completed at:</strong> <span id="timestamp"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let modelInfo = null;
+        
+        // Load model information on page load
+        async function loadModelInfo() {
+            try {
+                const response = await fetch('/model_info');
+                modelInfo = await response.json();
+                generateFeatureInputs();
+            } catch (error) {
+                console.error('Error loading model info:', error);
+                showError('Failed to load model information');
+            }
+        }
+
+        function generateFeatureInputs() {
+            if (!modelInfo) return;
+            
+            const container = document.getElementById('featureInputs');
+            container.innerHTML = '';
+            
+            // Generate first 10 feature inputs for demo (all 178 would be too many)
+            for (let i = 0; i < Math.min(10, modelInfo.feature_count); i++) {
+                const featureName = modelInfo.feature_names[i] || `Feature ${i+1}`;
+                const div = document.createElement('div');
+                div.className = 'feature-input';
+                div.innerHTML = `
+                    <label>${featureName}</label>
+                    <input type="number" step="any" id="feature_${i}" placeholder="0.0">
+                `;
+                container.appendChild(div);
+            }
+            
+            if (modelInfo.feature_count > 10) {
+                const info = document.createElement('div');
+                info.style.gridColumn = '1 / -1';
+                info.style.textAlign = 'center';
+                info.style.color = '#666';
+                info.style.fontStyle = 'italic';
+                info.innerHTML = `... and ${modelInfo.feature_count - 10} more features. Use JSON input for all features.`;
+                container.appendChild(info);
+            }
+        }
+
+        async function predict() {
+            const jsonInput = document.getElementById('jsonInput').value.trim();
+            let features = null;
+
+            // Hide previous results and errors
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('error').classList.remove('show');
+            
+            // Show loading
+            document.getElementById('loading').classList.add('show');
+
+            try {
+                if (jsonInput) {
+                    // Parse JSON input
+                    try {
+                        const parsed = JSON.parse(jsonInput);
+                        if (Array.isArray(parsed)) {
+                            features = parsed;
+                        } else if (typeof parsed === 'object') {
+                            features = parsed;
+                        } else {
+                            throw new Error('Invalid JSON format');
+                        }
+                    } catch (e) {
+                        throw new Error('Invalid JSON format. Please provide an array or object.');
+                    }
+                } else {
+                    // Collect individual feature inputs
+                    features = [];
+                    for (let i = 0; i < (modelInfo ? Math.min(10, modelInfo.feature_count) : 10); i++) {
+                        const input = document.getElementById(`feature_${i}`);
+                        const value = parseFloat(input.value) || 0;
+                        features.push(value);
+                    }
+                    
+                    // Pad with zeros if needed
+                    if (modelInfo && features.length < modelInfo.feature_count) {
+                        while (features.length < modelInfo.feature_count) {
+                            features.push(0);
+                        }
+                    }
+                }
+
+                // Make prediction request
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ features: features })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Prediction failed');
+                }
+
+                displayResults(result);
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                document.getElementById('loading').classList.remove('show');
+            }
+        }
+
+        function displayResults(result) {
+            // Determine if seizure detected (assuming class 1 is seizure)
+            const isSeizure = result.predicted_class === 1;
+            const seizureText = isSeizure ? '⚠️ SEIZURE DETECTED' : '✅ NO SEIZURE';
+            const seizureClass = isSeizure ? 'seizure-positive' : 'seizure-negative';
+
+            document.getElementById('predictionResult').innerHTML = 
+                `<span class="${seizureClass}">${seizureText}</span>`;
+
+            // Update confidence bar
+            const confidence = (result.confidence * 100).toFixed(1);
+            const confidenceBar = document.getElementById('confidenceBar');
+            confidenceBar.style.width = `${confidence}%`;
+            confidenceBar.textContent = `${confidence}%`;
+
+            // Update probabilities
+            const probContainer = document.getElementById('probabilities');
+            probContainer.innerHTML = '';
+            
+            Object.entries(result.probabilities).forEach(([className, probability]) => {
+                const div = document.createElement('div');
+                div.className = 'prob-item';
+                div.innerHTML = `
+                    <div class="prob-label">Class ${className}</div>
+                    <div class="prob-value">${(probability * 100).toFixed(1)}%</div>
+                `;
+                probContainer.appendChild(div);
+            });
+
+            // Update timestamp
+            document.getElementById('timestamp').textContent = 
+                new Date(result.timestamp).toLocaleString();
+
+            // Show results
+            document.getElementById('results').classList.add('show');
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+        }
+
+        function generateSample() {
+            if (!modelInfo) {
+                showError('Model information not loaded');
+                return;
+            }
+
+            // Generate random sample data
+            const sampleData = [];
+            for (let i = 0; i < modelInfo.feature_count; i++) {
+                sampleData.push((Math.random() - 0.5) * 2); // Random values between -1 and 1
+            }
+
+            document.getElementById('jsonInput').value = JSON.stringify(sampleData, null, 2);
+            
+            // Also update individual inputs
+            for (let i = 0; i < Math.min(10, modelInfo.feature_count); i++) {
+                const input = document.getElementById(`feature_${i}`);
+                if (input) {
+                    input.value = sampleData[i].toFixed(4);
+                }
+            }
+        }
+
+        function clearInputs() {
+            document.getElementById('jsonInput').value = '';
+            
+            // Clear individual inputs
+            for (let i = 0; i < 10; i++) {
+                const input = document.getElementById(`feature_${i}`);
+                if (input) {
+                    input.value = '';
+                }
+            }
+
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('error').classList.remove('show');
+        }
+
+        // Load model info when page loads
+        window.addEventListener('load', loadModelInfo);
+    </script>
+</body>
+</html>
